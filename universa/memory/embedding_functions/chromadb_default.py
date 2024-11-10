@@ -23,4 +23,4 @@ class ChromaDBDefaultEF(BaseEmbeddingFunction):
         except Exception as e:
             self.logger.error(f"Error in creating embeddings: {e}")
             raise e
-        
+

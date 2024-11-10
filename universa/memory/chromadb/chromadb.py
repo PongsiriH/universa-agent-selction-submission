@@ -27,6 +27,7 @@ class ChromaDB(VectorStore):
             db_path: str = "/tmp/chromadb.db", 
             embedding_function: Optional[BaseEmbeddingFunction] = None,
             collection_name: Optional[str] = None,
+            metadata=None
     ) -> None:
         self.client = chromadb.Client(Settings(
             allow_reset=True,
@@ -39,7 +40,8 @@ class ChromaDB(VectorStore):
         self._collection_name = collection_name
 
         self.collection = self.client.get_or_create_collection(
-            name = self.collection_name or "default_collection"
+            name = self.collection_name or "default_collection",
+            metadata=metadata
         )
 
         self.logger = get_logger(self.__class__.__name__)

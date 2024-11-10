@@ -11,6 +11,18 @@ Pillow==10.3.0
 pydantic==2.6.1
 pydantic_core==2.16.2
 python-dotenv==1.0.0
-tqdm==4.66.1
 typing_extensions==4.9.0
 urllib3>=2.2.2
+docstring_parser 
+tqdm
+matplotlib
+
+# Streamlit and compatibility.
+streamlit
+pysqlite3-binary
+
+# 
+nltk
+sentence_transformers
+sentence-transformers[onnx]
+faiss-cpu

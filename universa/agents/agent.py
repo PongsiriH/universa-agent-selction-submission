@@ -71,21 +71,22 @@ class BaseAgent(Executable):
         self.register(object_id=object_id)  # create ID & logger
 
         # Model & tools
-        self.model: ToolCaller = model or OpenAI.from_json(
-            os.path.join(get_parent_path(__file__, 2), 'models/schemas/openai.json')
-        )
-        self.available_tools = available_tools
-        self.model.prepare_tools(available_tools=available_tools)
+        if False:
+            self.model: ToolCaller = model or OpenAI.from_json(
+                os.path.join(get_parent_path(__file__, 2), 'models/schemas/openai.json')
+            )
+            self.available_tools = available_tools
+            self.model.prepare_tools(available_tools=available_tools)
 
-        # Core schemas
-        self.output_schema = None
-        self.message_schema = self.model.message_schema
+            # Core schemas
+            self.output_schema = None
+            self.message_schema = self.model.message_schema
 
-        # Chat history
-        self.chat_history = ChatHistory(message_schema=self.message_schema)
-        self.memory_window = memory_window  # how many messages back in history to look at when querying
-        self._create_and_save_message(role="system", content=self.system_prompt)  # save the initial system prompt
-        
+            # Chat history
+            self.chat_history = ChatHistory(message_schema=self.message_schema)
+            self.memory_window = memory_window  # how many messages back in history to look at when querying
+            self._create_and_save_message(role="system", content=self.system_prompt)  # save the initial system prompt
+            
         # Invoke retry & extraction parameters
         self.max_retries = max_retries
         self.auto_reinvoke = auto_reinvoke
@@ -327,6 +328,7 @@ class BaseAgent(Executable):
         constructor_args["model"] = model
 
         # Extract agent parameters that are not constructor arguments
+        uuid = constructor_args.pop("uuid")
         response_time = constructor_args.pop("response_time")
         input_cost = constructor_args.pop("input_cost")
         output_cost = constructor_args.pop("output_cost")
@@ -345,19 +347,20 @@ class BaseAgent(Executable):
         instance.average_rating = average_rating
         
         # Remove first system message from the chat history
-        if chat_history is not None and chat_history[0]["message"]["role"] == "system":
-            chat_history.pop(0)
+        if False:
+            if chat_history is not None and chat_history[0]["message"]["role"] == "system":
+                chat_history.pop(0)
 
-            # Deserialize chat history
-            chat_history = ChatHistory.deserialize(
-                chat_history,
-                message_schema=instance.message_schema
-            )
-            for message, metadata in zip(chat_history.messages, chat_history.metadata):
-                instance.chat_history.save_message(
-                    message, 
-                    metadata=metadata
+                # Deserialize chat history
+                chat_history = ChatHistory.deserialize(
+                    chat_history,
+                    message_schema=instance.message_schema
                 )
+                for message, metadata in zip(chat_history.messages, chat_history.metadata):
+                    instance.chat_history.save_message(
+                        message, 
+                        metadata=metadata
+                    )
 
         return instance
     

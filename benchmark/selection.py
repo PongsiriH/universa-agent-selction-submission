@@ -47,3 +47,24 @@ class ExampleAlgorithm(SelectionAlgorithm):
             documents=agent_data,
             ids=ids
         )
+
+class SolutionAlgorithm(SelectionAlgorithm):
+    """
+    Example selection algorithm.
+    """
+    def select(self, query: str) -> Tuple[str, str]:
+        results = self.chroma.query_data(query)
+        _id = results['ids'][0][0]
+        return _id, self.agents[self.ids.index(_id)]['name']
+    
+    def initialize(self, agents: List[Dict[str, Any]], ids: List[str]) -> None:
+        self.chroma = ChromaDB(
+            embedding_function=ChromaDBDefaultEF(),
+            collection_name="example_collection"
+        )
+
+        agent_data = [agent['description'] + "\n\n" + agent['system_prompt'] for agent in agents]
+        self.chroma.add_data(
+            documents=agent_data,
+            ids=ids
+        )

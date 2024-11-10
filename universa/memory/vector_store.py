@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 from typing import Any
 
-
 class VectorStore(ABC):
     """
     Base class for embedding functions.
@@ -21,4 +20,4 @@ class VectorStore(ABC):
         Query certain data through from the DB.
         """
         pass
-    
+

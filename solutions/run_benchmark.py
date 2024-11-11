@@ -69,5 +69,5 @@ def analyze_best():
 
 if __name__ == "__main__":
     runs = 5
-    # main()
-    analyze_best()
+    main()
+    # analyze_best()

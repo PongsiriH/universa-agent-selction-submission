@@ -45,29 +45,32 @@ def softmax_sampling(
     agents: List[Dict[str, Any]],
     key = "Composite Score",
     exploration_rate: float = 1.0,
+    n_samples :int=1
 ) -> Tuple[List[Dict[str, Any]], np.ndarray]:
     """
     Applies softmax sampling to the agents based on their composite scores.
 
     Args:
         agents (List[Dict[str, Any]]): A list of agents, each represented by a dictionary key.
-        exploration_rate (float, optional): The rate to control exploration; lower values increase exploration by flattening softmax probabilities. Defaults to 1.0.
+        key (str): The key for composite scores.
+        exploration_rate (float): Controls exploration; lower values increase exploration by flattening probabilities.
+        n_samples (int): Number of samples to draw.
 
     Returns:
-        Tuple[List[Dict[str, Any]], np.ndarray]: 
-            - List of agents with original data.
-            - Numpy array of softmax scores corresponding to each agent.
+        Tuple[List[int], List[str]]: 
+            - List of sampled indices.
+            - List of sampled agent IDs.
     """
     # Normalize composite scores with exploration rate
     logits = np.array([agent[key] for agent in agents]) / exploration_rate
     exp_logits = np.exp(logits - np.max(logits))  # Numerical stability
     softmax_scores = exp_logits / np.sum(exp_logits)
     
-    # Sample agent based on softmax probabilities
-    sampled_agent_index = np.random.choice(len(agents), size=1, p=softmax_scores)[0]
-    sampled_agent_uuid = agents[sampled_agent_index]["Agent ID"]
+    # Sample multiple agents based on softmax probabilities
+    sampled_agent_indices = np.random.choice(len(agents), size=n_samples, p=softmax_scores)
+    sampled_agent_ids = [agents[idx]["Agent ID"] for idx in sampled_agent_indices]
 
-    return sampled_agent_index, sampled_agent_uuid
+    return sampled_agent_indices, sampled_agent_ids, softmax_scores
 
 class Algorithm2(SelectionAlgorithm):
     """
@@ -112,7 +115,7 @@ class Algorithm2(SelectionAlgorithm):
         self.agents_dict = {agent['name']: agent for agent in agents}
         self.agents_id_dict = {agent['object_id']: agent for agent in agents}
         
-    def select(self, query: str, n_results=5, k=60):
+    def select(self, query: str, n_results=5, k=60, return_best=True):
         """
         Selects the most relevant agent based on the provided query, using Reciprocal Rank Fusion (RRF).
 
@@ -156,57 +159,12 @@ class Algorithm2(SelectionAlgorithm):
         scored_agents.sort(key=lambda x: x["Combined RRF Score"], reverse=True)
 
         # Return top agent or None if no agents found
-        selected_agent = scored_agents[0] if scored_agents else None
-        return (selected_agent["Agent ID"], selected_agent["Agent name"]) if selected_agent else (None, None)
-
-    def sample(self, query: str, n_results=5, k=60):
-        """
-        Selects the most relevant agent based on the provided query, using Reciprocal Rank Fusion (RRF).
-
-        Args:
-            query (str): The input query used to search and rank agents.
-            n_results (int, optional): The number of top agents to retrieve based on the initial query results. Defaults to 5.
-            k (int, optional): The constant used in the RRF score calculation. Defaults to 60.
-
-        Returns:
-            Tuple[Optional[str], Optional[str]]: A tuple containing:
-                - str: The unique identifier (Agent ID) of the best-matching agent.
-                - str: The name of the best-matching agent.
-                Returns (None, None) if no suitable agent is found.
-        """
-        rrf_scores = {}
-
-        if self.chromas[0] is not None:
-            lexical_results = self.chromas[0].query_data([query], n_results=n_results)
-
-            # Process lexical results with RRF scoring
-            for rank, (agent_id, dissimilarity_score) in enumerate(zip(lexical_results["ids"][0], lexical_results["distances"][0])):
-                similarity_score = 1 - dissimilarity_score
-                if similarity_score >= 0.1:  # Only include relevant lexical results
-                    rrf_score = 1 / (rank + k) * math.sqrt(similarity_score) 
-                    rrf_scores[agent_id] = rrf_scores.get(agent_id, 0) + rrf_score
-                # print(f'lexical similarity_score={similarity_score}')
-
-        # Process semantic results with RRF scoring
-        semantic_results = self.chromas[1].query_data([query], n_results=n_results)
-        for rank, (agent_id, dissimilarity_score) in enumerate(zip(semantic_results["ids"][0], semantic_results["distances"][0])):
-            similarity_score = 1 - dissimilarity_score
-            rrf_score = (1 / (rank + k)) * math.sqrt(similarity_score)
-            rrf_scores[agent_id] = rrf_scores.get(agent_id, 0) + rrf_score
-            # print(f'semantic similarity_score={similarity_score}')
-
-        # Retrieve agent details and sort by combined RRF score
-        scored_agents = [
-            {"Agent ID": agent_id, "Combined RRF Score": score, "Agent name": self.agents_id_dict[agent_id]["name"]}
-            for agent_id, score in rrf_scores.items()
-        ]
-        scored_agents.sort(key=lambda x: x["Combined RRF Score"], reverse=True)
-
-        # Return top agent or None if no agents found
-        selected_agent = scored_agents[0] if scored_agents else None
-        return (selected_agent["Agent ID"], selected_agent["Agent name"]) if selected_agent else (None, None)
-
-    def _score_agent(self, agent_id: str, dissimilarity_score: float) -> dict:
+        if return_best:
+            selected_agent = scored_agents[0] if scored_agents else None
+            return (selected_agent["Agent ID"], selected_agent["Agent name"]) if selected_agent else (None, None)
+        return scored_agents
+    
+    def score_agent(self, agent_id: str, dissimilarity_score: float) -> dict:
         """
         Helper function to calculate and return agent scores as a dictionary.
         """

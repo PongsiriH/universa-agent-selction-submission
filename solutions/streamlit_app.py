@@ -34,12 +34,20 @@ def setup_selection_algorithm():
     return selection
 
 selection = setup_selection_algorithm()
+default_query = "This AI agent specializes in artificial intelligence and machine learning, with expertise in Python, TensorFlow, and PyTorch. It excels in developing and deploying AI models for various applications."
+exploration_rate = st.slider("Exploration Rate", min_value=0.01, max_value=10.0, value=5.0, step=0.1)
+st.markdown("""
+**Exploration Rate Explanation:**
+
+- **High Exploration Rate (closer to 10.0)**: Leads to more uniform probabilities, meaning each agent has a more equal chance of being sampled. This encourages a broader selection across all agents, even if some agents have lower scores.
+
+- **Low Exploration Rate (closer to 0.01)**: Amplifies the differences in scores, giving higher-probability agents a much stronger weight in sampling. This should focus the selection on top-performing agents, reducing exploration to prioritize those with higher scores.
+""")
 
 # Query input section
 st.write("### Enter a New Query")
-query = st.text_input("Enter a query:", "")
+query = st.text_input("Enter a query:", default_query)
 if st.button("Submit Query"):
-    
     # 1. Retrieve agent results based on the query
     results = selection.select(query, return_best=False)
     agent_info_list = [
@@ -47,16 +55,24 @@ if st.button("Submit Query"):
         for result in results
     ]
 
-    exploration_rate = st.slider("Exploration Rate", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
     col1, col2 = st.columns([1, 1])
     # 2. Top N Agents - Display agent information table with sample counts
     with col1:
-        st.write("### Top N Agents (with Sample Counts)")
+        st.markdown("""
+        ### Top N Agents Summary
+
+        This section displays the **Top N Agents** based on their "Adjusted Composite Score." We select a fixed number of top agents (N) and use softmax sampling to highlight the most relevant agents. 
+
+        - **Top N Selection**: Agents are sorted by "Adjusted Composite Score" to focus on the highest-performing options.
+        - **Softmax Sampling**: After selecting the top agents, a softmax sampling process is applied to simulate the selection probabilities. 
+
+        The **Sample Count** column reflects the frequency with which each agent is sampled based on the adjusted scores and exploration rate.
+        """)
         agent_info_df = pd.DataFrame(agent_info_list)
 
         # Perform softmax sampling on "Adjusted Composite Score" and add 'Sample Count' column
         sampled_agent_index, sampled_agent_ids, softmax_scores = softmax_sampling(
-            agent_info_list, "Adjusted Composite Score", exploration_rate=exploration_rate, n_samples=100
+            agent_info_list, "Adjusted Composite Score", exploration_rate=exploration_rate / 5, n_samples=100
         )
         sample_counts = Counter(sampled_agent_ids)
         agent_info_df['Sample Count'] = agent_info_df['Agent ID'].map(sample_counts).fillna(0).astype(int)
@@ -65,6 +81,7 @@ if st.button("Submit Query"):
         fig, ax = plt.subplots(figsize=(10, 4))
         agent_names = [agent["Agent name"] for agent in agent_info_list]
         ax.bar(agent_names, softmax_scores)
+        ax.set_ylim(0, 1)
         ax.set_xlabel("Agents")
         ax.set_ylabel("Softmax Score")
         ax.set_title("Softmax Scores for Top N Agents")
@@ -80,7 +97,15 @@ if st.button("Submit Query"):
 
     # 3. Filtered Agents - Display agents filtered by similarity score with updated sample counts
     with col2:
-        st.write("### Filtered Agents (Similarity Score > 80% of Max)")
+        st.markdown("""
+        ### Filtered Agents Summary
+
+        This section displays **Filtered Agents** who meet a similarity threshold:
+        - **Similarity Score > 80% of Max**: Agents are filtered to include only those with a similarity score greater than 80% of the maximum similarity score for the query. This focuses on agents most closely matching the query requirements.
+
+        - After filtering, a **softmax sampling** process is applied on the "Composite Score" to adjust the selection probability.
+        ######
+        """)
         # Filter agents with similarity score > 80% of max similarity score
         filtered_agent_info_df = agent_info_df[agent_info_df['Similarity Score'] > 0.8 * agent_info_df['Similarity Score'].max()]
 
@@ -96,6 +121,7 @@ if st.button("Submit Query"):
         fig, ax = plt.subplots(figsize=(10, 4))
         filtered_agent_names = filtered_agent_info_df['Agent name'].tolist()
         ax.bar(filtered_agent_names, filtered_softmax_scores)
+        ax.set_ylim(0, 1)
         ax.set_xlabel("Filtered Agents")
         ax.set_ylabel("Softmax Score")
         ax.set_title("Softmax Scores for Filtered Agents")
@@ -106,5 +132,5 @@ if st.button("Submit Query"):
         # Display the filtered DataFrame without 'Agent ID' column
         column_order = ["Agent ID", "Agent name", "Sample Count", "Composite Score", "Adjusted Composite Score", 
                 "Similarity Score", "Quality Score", "Log Popularity", "Cost", "Response Time", "Agent description"]
-        filtered_agent_info_df = agent_info_df[column_order]
+        filtered_agent_info_df = filtered_agent_info_df[column_order]
         st.dataframe(filtered_agent_info_df.drop(columns=["Agent ID"]))

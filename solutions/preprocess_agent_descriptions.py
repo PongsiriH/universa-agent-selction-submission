@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 import ollama
 
 import json, pickle
-
+import os
 import numpy as np
 import tqdm
 
@@ -116,7 +116,6 @@ def rephrase_description5(agent_name: str, description: str, system_prompt: str)
     """
     Generate a concise and clear description of the agent based on the cleaned description and system prompt,
     focusing on key tasks, expertise, and core functionality relevant for embedding comparisons.
-    Additionally, generate sample queries that a user might ask based on the agent's expertise.
     
     Args:
         agent_name (str): The name of the agent.
@@ -144,38 +143,37 @@ def rephrase_description5(agent_name: str, description: str, system_prompt: str)
                 "Retain only relevant tasks and techniques.\n\n"
                 
                 "3. **Craft a Concise, Focused Summary**:\n"
-                "   - Using the refined information, create a brief, objective description that highlights specific skills, primary tasks, and key techniques, as well as any particular areas of specialization. Avoid generalizations and only include essential details.\n\n"
-                
+                "   - Using the refined information, create a brief, objective description that highlights specific skills, primary tasks, and key techniques, with particular emphasis on domain-specific terminology."
+                "Avoid generalizations and only include essential details.\n\n"
+
                 "### Examples\n"
+                
                 "**Input**\n"
                 "Agent Name: Financial Forecasting Analyst\n"
                 "Description: AI focused on financial data analysis, trend prediction, and risk assessment.\n"
                 "System Prompt: Uses statistical models and machine learning to forecast financial trends, assess risks, and generate investment insights.\n\n"
-                
+    
                 "**Output**\n"
-                "Processed Description:\n"
                 "Financial trend forecasting, risk assessment, and investment insight generation. Statistical models and machine learning to analyze and "
-                "predict market trends, supporting data-driven financial decision-making.\n\n"
+                "predict market trends, using terms like lasso regression analysis, risk modeling, and predictive analytics for data-driven decision-making.\n\n"
 
                 "**Input**\n"
                 "Agent Name: Fantasy Novel Writer\n"
                 "Description: An author specializing in fantasy novels, with a talent for complex world-building and character-driven stories.\n"
                 "System Prompt: Crafts imaginative worlds with intricate details, focusing on deep character arcs and elaborate plot structures in a high-fantasy setting.\n\n"
-                
+
                 "**Output**\n"
-                "Processed Description:\n"
-                "High-fantasy world-building, creating intricate, imaginative settings with rich character development and layered plot structures. "
-                "Detailed, character-driven narratives that immerse readers in complex, otherworldly realms.\n\n"
+                "High-fantasy world-building, with a focus on creating intricate settings and character arcs. In-depth character development and layered plot "
+                "structures, incorporating rare elements like mythopoeic themes and archetypal symbolism to enrich fantasy narratives.\n\n"
 
                 "**Input**\n"
                 "Agent Name: Thai Cooking Chef\n"
                 "Description: A chef with expertise in Thai cuisine, known for balancing flavors and crafting traditional dishes.\n"
                 "System Prompt: Prepares authentic Thai dishes with a focus on balancing sweet, sour, salty, and spicy flavors, using traditional techniques like wok cooking and mortar-pounding herbs.\n\n"
-                
+
                 "**Output**\n"
-                "Processed Description:\n"
-                "Authentic Thai cuisine, Flavor balance through traditional techniques like wok cooking and mortar-pounding herbs. "
-                "Crafts dishes that emphasize harmony between sweet, sour, salty, and spicy elements, with an cultural authenticity.\n\n"
+                "Authentic Thai cuisine, with a focus on flavor balance through techniques like wok cooking and mortar-pounding herbs."
+                "Such as 'nam prik' (chili paste) and 'pad krapow' to craft dishes with harmony between sweet, sour, salty, and spicy elements and cultural authenticity.\n\n"
             )
         },
         {
@@ -201,25 +199,36 @@ def rephrase_description5(agent_name: str, description: str, system_prompt: str)
         logger.error(f"Error generating processed description and example queries: {e}")
         raise
 
-def process_benchmark_agents():
-    # Clean and rephrase agent description.
+def process_benchmark_agents(i=0):
+    # Load the original agents file
     with open('benchmark/benchmark.json', 'r', encoding='utf-8') as f:
         agents = json.load(f)
 
+    # Check if processed file exists to retain previous descriptions
+    processed_file_path = 'benchmark/benchmark_with_processed_description.json'
+    if os.path.exists(processed_file_path):
+        with open(processed_file_path, 'r', encoding='utf-8') as f:
+            existing_agents = {agent['name']: agent for agent in json.load(f)}
+    else:
+        existing_agents = {}
+
     processed_agents = []
-    for agent in tqdm.tqdm(agents):
+    for agent in agents:
+        # Use existing data if it's already there, otherwise start fresh
+        processed_agent = existing_agents.get(agent['name'], agent)
+        
+        # Process the current description
         cleaned_description = clean_agent_description(agent['description'])
         cleaned_system_prompt = clean_agent_description(agent['system_prompt'])
         rephrased_description = rephrase_description5(agent['name'], cleaned_description, cleaned_system_prompt)
         
-        agent['processed_description'] = rephrased_description
-        processed_agents.append(agent)
+        # Store the processed description with the current index
+        processed_agent[f'processed_description_{i}'] = rephrased_description
+        processed_agents.append(processed_agent)
 
-    # Save processed agents to file
-    with open('benchmark/benchmark_with_processed_description.json', 'w', encoding='utf-8') as f:
+    # Save all processed descriptions back to the file
+    with open(processed_file_path, 'w', encoding='utf-8') as f:
         json.dump(processed_agents, f, indent=4, ensure_ascii=False)
-    
-    return processed_agents
 
 def find_similar_agents():
     # Load processed agents from the file created by process_benchmark_agents

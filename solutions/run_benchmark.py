@@ -1,64 +1,63 @@
 import _import_root
-from solutions.selection_algorithm import Algorithm1, Algorithm2
+from solutions.selection_algorithm import Algorithm2
 from benchmark.benchmark import Benchmark
-from solutions.preprocess_agent_descriptions import process_benchmark_agents, repetitively_process_benchmark_agents
+from solutions.preprocess_agent_descriptions import process_benchmark_agents
 from solutions.custom_embedder import (
-    SentenceTransformerEF, TfIdfEF, EnsembleEF, SPLADEEmbeddingFunction
+    SentenceTransformerEF, TfIdfEF, SPLADEEmbeddingFunction
 )
+import pandas as pd
+from tqdm import tqdm
 
-def algorithm1_with_raw_description():
-    benchmark = Benchmark('benchmark.json')
-    algorithm = Algorithm1(benchmark.agents, benchmark.agent_ids)
-    algorithm.ranked_by('description', "Similarity Score")
-    tfidf = TfIdfEF()
-    tfidf.fit(algorithm.descriptions)
-    algorithm.configure_embeddings_and_setup_chromadb(EnsembleEF([SentenceTransformerEF("all-mpnet-base-v2"), tfidf], weights=[1, 0.5]))
-    # algorithm.configure_embeddings_and_setup_chromadb(SentenceTransformerEF("all-mpnet-base-v2"))
-    score = benchmark.validate(algorithm, verbose=False)
-    return score
-
-def algorithm1_with_processed_description():
-    benchmark = Benchmark('benchmark_with_processed_description.json')
-    algorithm = Algorithm1(benchmark.agents, benchmark.agent_ids)
-    algorithm.ranked_by('processed_description', "Similarity Score")
-    tfidf = TfIdfEF((2,3))
-    tfidf.fit(algorithm.descriptions)
-    algorithm.configure_embeddings_and_setup_chromadb(EnsembleEF([SentenceTransformerEF("all-mpnet-base-v2"), tfidf], [2, 1]))
-    # algorithm.configure_embeddings_and_setup_chromadb(SentenceTransformerEF("all-mpnet-base-v2"))
-    score = benchmark.validate(algorithm, verbose=True)
-    return score
-
-def algorithm2_with_processed_description():
+def run_algorithm2(description_type, embedding_functions, verbose=False):
     benchmark = Benchmark('benchmark_with_processed_description.json')
     algorithm = Algorithm2(benchmark.agents, benchmark.agent_ids)
-    algorithm.ranked_by('processed_description', "Similarity Score")
-    algorithm.configure_embeddings_and_setup_chromadb([SPLADEEmbeddingFunction(), SentenceTransformerEF("all-mpnet-base-v2")], )
-    score = benchmark.validate(algorithm, verbose=True)
+    algorithm.ranked_by(description_type, "Similarity Score")
+    [ef.fit(algorithm.descriptions) for ef in embedding_functions if hasattr(ef, 'fit')]
+    algorithm.configure_embeddings_and_setup_chromadb(embedding_functions)
+    score = benchmark.validate(algorithm, verbose=verbose)
     return score
 
 if __name__ == "__main__":
     runs = 5
-    score1_runs = []
-    score2_runs = []
-    score3_runs = []
+    input_keys = ['description', 'processed_description']
+    embedding_functions_configs = {
+        "mpnet": [None, SentenceTransformerEF("all-mpnet-base-v2")],
+        "allMiniLM": [None, SentenceTransformerEF('sentence-transformers/all-MiniLM-L6-v2')],
+        "splade": [None, SPLADEEmbeddingFunction()],
+        "tfidf": [None, TfIdfEF(ngram_range=(2,3))],
+        "tfidf_and_allMiniLM": [TfIdfEF(ngram_range=(2,3)), SentenceTransformerEF('sentence-transformers/all-MiniLM-L6-v2')],
+        "splade_and_allMiniLM": [SPLADEEmbeddingFunction(), SentenceTransformerEF('sentence-transformers/all-MiniLM-L6-v2')],
+        "tfidf_and_mpnet": [TfIdfEF(ngram_range=(2,3)), SentenceTransformerEF("all-mpnet-base-v2")],
+        "splade_and_mpnet": [SPLADEEmbeddingFunction(), SentenceTransformerEF("all-mpnet-base-v2")],
+        "tfidf_and_splade": [TfIdfEF(ngram_range=(2,3)), SPLADEEmbeddingFunction()],
+        "allMiniLM_and_mpnet": [SentenceTransformerEF('sentence-transformers/all-MiniLM-L6-v2'), SentenceTransformerEF("all-mpnet-base-v2")],
+    }
+    scores = {f"{config_name}_{input_key}": [] 
+              for config_name in embedding_functions_configs 
+              for input_key in input_keys}
 
-    for _ in range(runs):
-        score1_runs.append(algorithm1_with_raw_description())
-        
-        process_benchmark_agents() # require ollma with mistral model.
-        score2_runs.append(algorithm1_with_processed_description())
-        score3_runs.append(algorithm2_with_processed_description())
+    for run in tqdm(range(runs), desc="Total Runs"):
+        # UNCOMMENT the next line if you want new preprocessed descriptions. Note that it requires Ollama. 
+        # process_benchmark_agents(run)
 
-    # Calculate the average for each score
-    score1_avg = sum(score1_runs) / runs
-    score2_avg = sum(score2_runs) / runs
-    score3_avg = sum(score3_runs) / runs
+        for input_key in input_keys:
+            input_key_run = f'{input_key}_{run}' if input_key.startswith('processed_description') else input_key
 
-    print(f'\nAverages:\n1 (avg): {score1_avg}\n2 (avg): {score2_avg}\n3 (avg): {score3_avg}')
+            for config_name, embedding_functions_config in tqdm(embedding_functions_configs.items(), leave=False, desc="Configurations"):
+                score = run_algorithm2(input_key_run, embedding_functions_config, verbose=False)
+                scores[f"{config_name}_{input_key}"].append(score)
 
-    for i in range(runs):
-        print(f'Run {i+1} - ', end=' ')
-        print(f'1: {score1_runs[i]: .4f}, ', end='')
-        print(f'2: {score2_runs[i]: .4f}, ', end='')
-        print(f'3: {score3_runs[i]: .4f}, ', end='')
-        print()
+    # Calculate the average score for each configuration-input key pair
+    averages = {config_name: sum(score_list) / runs for config_name, score_list in scores.items()}
+    # Convert scores to a DataFrame
+    score_data = {}
+    for config_input_key, score_list in scores.items():
+        if len(score_list) == runs:
+            score_data[config_input_key] = score_list + [sum(score_list) / runs]
+    
+    # Create a DataFrame with run columns and an average column
+    df = pd.DataFrame.from_dict(score_data, orient='index', columns=[f"Run {i+1}" for i in range(runs)] + ["Average"])
+    # Display the DataFrame
+    print("\nScores Table:")
+    print(df)
+    df.to_csv('solutions/results.csv')

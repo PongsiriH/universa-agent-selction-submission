@@ -176,31 +176,3 @@ class SPLADEEmbeddingFunction(BaseEmbeddingFunction):
             embeddings.append(sparse_vec.tolist())  # Convert tensor to list for compatibility
 
         return embeddings
-    
-class EnsembleEF(BaseEmbeddingFunction):
-    def __init__(self, embedding_functions: List[BaseEmbeddingFunction], weights: List[float], normalize: bool = False):
-        self.embedding_functions = embedding_functions
-        self.weights = weights
-        self.normalize = normalize  # Add this to enable normalization for cosine similarity
-        self.logger = get_logger(self.__class__.__name__)
-
-    def create_embeddings(self, texts: List[str], weights=None) -> List[List[float]]:
-        weights = self.weights if weights is None else weights
-        normalized_weights = np.array(weights) / np.sum(weights)
-
-        try:
-            all_embeddings = []
-            for ef, weight in zip(self.embedding_functions, normalized_weights):
-                embeddings = np.array(ef.create_embeddings(texts)) * weight
-                all_embeddings.append(embeddings)
-
-            combined_embeddings = np.concatenate(all_embeddings, axis=1)
-
-            # Normalize if cosine similarity is used
-            if self.normalize:
-                combined_embeddings = combined_embeddings / (np.linalg.norm(combined_embeddings, axis=1, keepdims=True) + 1e-8)
-            return combined_embeddings
-        
-        except Exception as e:
-            self.logger.error(f"Error in creating ensemble embeddings: {e}")
-            raise e

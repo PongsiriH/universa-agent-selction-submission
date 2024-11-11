@@ -20,7 +20,7 @@ class Benchmark:
         self.results = []
 
     def validate(self, algorithm: SelectionAlgorithm, verbose: bool = True) -> float:
-        for query in tqdm(self.queries, desc="Validating queries"):
+        for query in self.queries:
             result_id, result_agent = algorithm.select(query['query'])
             if query['object_id'] == result_id:
                 self.results.append(True)

@@ -10,7 +10,7 @@
         "rated_responses": 45,
         "average_rating": 6.5,
         "object_id": "cf755959-9964-4e98-ba04-146598620c0e",
-        "processed_description": "Web Development Assistant, focusing on HTML, CSS, and JavaScript tasks, providing code examples for various web development needs."
+        "processed_description": "Web Developer Assistant, specializing in front-end development tasks using HTML, CSS, and JavaScript. Provides code examples for web development issues."
     },
     {
         "name": "Full Stack Developer",
@@ -23,7 +23,7 @@
         "rated_responses": 178,
         "average_rating": 8.7,
         "object_id": "b1fa799e-1b14-4cff-8fa3-78f8aff1c41b",
-        "processed_description": "Full-stack web development in React, Node.js, and modern architectures. Provides technical guidance, code reviews, and architectural recommendations with emphasis on security, performance, and scalability. Utilizes comments for clarity in code examples, explains trade-offs, and references relevant design patterns and industry best practices."
+        "processed_description": "Web development with React, Node.js, and modern architectures. Code reviews, technical guidance, and architectural recommendations for optimal performance, scalability, and security. Focus on design patterns and best practices for software implementation, providing comments and explanations on trade-offs in code examples."
     },
     {
         "name": "Web Architect",
@@ -36,7 +36,7 @@
         "rated_responses": 52,
         "average_rating": 9.2,
         "object_id": "9e178cb7-131e-4195-824f-176559eaf372",
-        "processed_description": "Enterprise web solutions architecture and senior full-stack development for complex applications. Core expertise in distributed systems, microservices, cloud infrastructure, and modern web development.\nPrimary tasks include providing analysis, recommendations, and architectural diagrams for scalable, reliable, secure, and maintainable web applications. Address concerns about system integration, data consistency, and performance optimization, while referencing enterprise design patterns, industry standards, and compliance requirements. Develops technical guidance and conducts code reviews in React, Node.js, and modern web architectures, focusing on security, performance, and scalability. Offers explanations of trade-offs and relevant design patterns while adapting response detail based on the query's level of implementation specificity."
+        "processed_description": "Enterprise web solutions architecting and senior full-stack development in distributed systems and microservices architecture, with a focus on cloud infrastructure, scalability, reliability, security, maintainability, and modern web development. Provides comprehensive analysis, design recommendations, detailed diagrams, deployment strategies, technology stack suggestions, and addresses concerns about system integration, data consistency, and performance optimization. Practical implementation knowledge includes code-level optimizations in React, Node.js, and related modern web architectures. Offers technical guidance, conducts code reviews, and emphasizes security, performance, and scalability throughout development tasks. Adapts technical depth based on query specificity, from high-level architecture to specific implementation details."
     },
     {
         "name": "ML Engineer",
@@ -49,7 +49,7 @@
         "rated_responses": 85,
         "average_rating": 6.8,
         "object_id": "b02e2b7b-7c1e-43ec-8a5d-c9b1ee21b043",
-        "processed_description": "Machine Learning Engineer Assistant\n- Data preprocessing, model training, and evaluation tasks\n- Basic machine learning model implementation and application of evaluation metrics\n- Provides code examples for improved understanding and efficiency in machine learning projects."
+        "processed_description": "Machine Learning Engineer Assistant: Data preprocessing, model training, and evaluation. Provides technical assistance in implementing basic machine learning models and evaluating their performance using relevant metrics, with code examples to support these tasks."
     },
     {
         "name": "Deep Learning Engineer",
@@ -62,7 +62,7 @@
         "rated_responses": 142,
         "average_rating": 8.9,
         "object_id": "257a4a59-ccc8-4285-b9b7-83af2131cbdd",
-        "processed_description": "Deep learning model development, optimization, and deployment with focus on computer vision and natural language processing (NLP). Proficient in using PyTorch and TensorFlow for implementing deep learning architectures, with expertise in hyperparameter tuning and optimization techniques. Emphasis on computational efficiency, model interpretability, and scalability. Provides code examples with comments, references theoretical foundations, recent research papers, and industry best practices."
+        "processed_description": "Deep learning, computer vision, and natural language processing (NLP). Model architecture design, hyperparameter tuning, and optimization for computational efficiency and scalability. Emphasis on model interpretability and understanding theoretical foundations. Relevant code examples with explanatory comments and reference to recent research papers and industry best practices where applicable."
     },
     {
         "name": "Machine Learning Researcher",
@@ -75,7 +75,7 @@
         "rated_responses": 45,
         "average_rating": 9.4,
         "object_id": "32c34d08-c108-4f5d-92bd-a311243eb134",
-        "processed_description": "Machine Learning Research: Focuses on cutting-edge algorithms, novel architectures, and state-of-the-art implementations in ML. Key tasks include analyzing recent papers, mastering mathematical foundations, exploring novel approaches, considering theoretical guarantees, computational complexity, and empirical validation. Implementation expertise covers complex model architectures, custom loss functions, advanced optimization techniques, and efficient, numerically stable distributed training. Code examples come with thorough documentation and theoretical justification, referencing relevant research papers and mathematical concepts."
+        "processed_description": "Machine learning research, focusing on advanced algorithms, novel architectures, and state-of-the-art implementations. Analyzing recent papers, mathematical foundations, and emerging approaches in ML, including theoretical guarantees, computational complexity, and empirical validation. Implementing complex model architectures, custom loss functions, and advanced optimization techniques for improved memory efficiency, numerical stability, and distributed training. Code examples with thorough documentation and theoretical justification, referencing relevant research papers and mathematical concepts."
     },
     {
         "name": "AI Researcher",
@@ -88,7 +88,7 @@
         "rated_responses": 120,
         "average_rating": 7.5,
         "object_id": "a4a6546b-0ec4-4626-9dea-baf87a183068",
-        "processed_description": "AI Research Assistant: Machine learning fundamentals, neural networks, and AI algorithm implementation. Understanding AI concepts and providing simple, clear examples of current AI trends and developments. Core focus on fundamental research in artificial intelligence."
+        "processed_description": "AI Research Assistant:\nFocuses on understanding fundamental concepts, current trends, and implementation of AI algorithms. Familiar with machine learning fundamentals, neural networks, and basic AI algorithms. Provides simple examples and clear explanations to explain recent advancements in AI technology."
     },
     {
         "name": "AGI Researcher",
@@ -101,7 +101,7 @@
         "rated_responses": 65,
         "average_rating": 8.9,
         "object_id": "6077da73-2313-4122-8fc0-c9d5bcf5886a",
-        "processed_description": "AI Researcher specializing in Artificial General Intelligence (AGI), with expertise in neural architectures, advanced AI alignment problems, and theoretical frameworks. Core tasks include:\n- Designing and implementing AGI theories\n- Analyzing neural scaling laws\n- Addressing AI safety concerns\n- Developing AI architectures and solving computational requirements\n- Referencing relevant research papers, foundations, and empirical evidence\n- Discussing limitations and potential risks associated with proposed approaches, considering ethical constraints."
+        "processed_description": "AI Researcher in Artificial General Intelligence (AGI) focusing on theory development, neural architectures, and advanced AI alignment problems.\n   - Conducts research in AGI theory, neural scaling laws, and AI safety.\n   - Develops AI architectures, theoretical frameworks, and implementation strategies.\n   - Analyzes mathematical proofs, complexity, and computational requirements.\n   - Discusses ethical constraints related to AI development and deployment.\n   - Considers potential risks and limitations of proposed approaches in the field.\n   - Keeps up-to-date with relevant research papers, theoretical foundations, and empirical evidence in AGI research."
     },
     {
         "name": "AI Architect",
@@ -114,7 +114,7 @@
         "rated_responses": 78,
         "average_rating": 8.8,
         "object_id": "79515e96-4ed9-455d-9ce3-706eb647ef0f",
-        "processed_description": "AI Systems Architecture: Focuses on large-scale AI deployment, architectural innovation, and advanced design principles, leveraging theoretical knowledge for practical engineering. Key responsibilities include analyzing system requirements, computational efficiency, and scalability concerns in distributed AI systems. Utilizes model serving architectures, system integration, and addresses latency requirements, resource utilization, and reliability metrics. Theoretical aspects involve incorporating insights from scaling laws, information theory, and AI alignment research. Analyzes architectural choices through mathematical foundations and theoretical frameworks while considering computational complexity, optimization theory, and statistical guarantees. Provides comprehensive solutions bridging theory and practice, addressing deployment strategies, monitoring solutions, and performance optimization techniques. Includes security considerations, failure modes, and AI alignment concerns in AI systems design."
+        "processed_description": "AI Systems Architecture, Large-scale deployment and advanced design principles. Focus on computational efficiency, scalability, system integration, latency requirements, resource utilization, reliability metrics, and theoretical frameworks (e.g., scaling laws, information theory, AI alignment research). Practical engineering expertise with mathematical foundations in optimization theory, statistical guarantees, and relevant deployment strategies, monitoring solutions, and performance optimization techniques. Security considerations, failure modes, and alignment concerns addressed in AI system design. Theoretical insights incorporated from relevant research papers to bridge theory and practice."
     },
     {
         "name": "Market Analyst",
@@ -127,7 +127,7 @@
         "rated_responses": 180,
         "average_rating": 7.2,
         "object_id": "b0227ed6-6034-464e-b3bc-6bc38c2e8eab",
-        "processed_description": "Market analysis for retail investors, simplifying complex financial concepts. Basic investment principles understanding, focusing on interpreting financial statements, assessing market trends, and identifying fundamental investing insights with easy-to-follow examples."
+        "processed_description": "Market Analysis and Investment Fundamentals Explanation:\nSimplifying complex financial concepts for retail investors. Key focus areas include understanding basic financial statements, market trends, and investment fundamentals, using clear examples to help beginners grasp essential ideas."
     },
     {
         "name": "Quantitative Analyst",
@@ -140,7 +140,7 @@
         "rated_responses": 60,
         "average_rating": 8.7,
         "object_id": "5f08e1fa-c98b-4921-a771-8d5669c9f4d9",
-        "processed_description": "Quantitative analysis, algorithmic trading strategies, and financial mathematics. Expertise in stochastic calculus, time series analysis, and risk modeling. In-depth knowledge of mathematical derivations, statistical tests, and code implementation using Python/R. Emphasis on transaction costs, market impact, and regulatory constraints. Backtesting results and risk metrics are always provided, along with references to academic papers and industry practices in systematic trading."
+        "processed_description": "Quantitative analysis, focusing on stochastic calculus, time series analysis, and mathematical modeling of financial markets. Implementation of statistical derivations, trading strategies, risk models, and market microstructure considerations in Python/R.\n   Key tasks include:\n   - Designing algorithmic trading strategies with emphasis on backtesting results and associated risk metrics.\n   - Analyzing financial data using mathematical approaches to uncover patterns and trends.\n   - Addressing transaction costs, market impact, and regulatory constraints in the development of quantitative trading models.\n   - Referencing academic papers and industry practices in systematic trading for continuous learning and innovation."
     },
     {
         "name": "Financial Analyst",
@@ -153,7 +153,7 @@
         "rated_responses": 65,
         "average_rating": 8.4,
         "object_id": "6e9ee84e-da67-41e7-a409-28455920d289",
-        "processed_description": "Financial Analyst - ESG Investing:\nAnalyzing companies' environmental, social, and governance (ESG) performance using metrics, impact measurement frameworks, and sustainability reporting standards. Focuses on climate risk, social impact, and governance quality assessment. Utilizes ESG scoring methodologies, regulatory compliance analysis, and develops sustainable investment strategies. Includes carbon footprint calculations, SDG alignment evaluation, and greenwashing risk determination."
+        "processed_description": "Financial analysis in ESG (Environmental, Social, and Governance) investing, sustainable finance strategies, and impact measurement. Evaluates companies using ESG metrics, impact measurement frameworks, and sustainability reporting standards. Focuses on assessing climate risk, social impact, and governance quality. Proficient in ESG scoring methodologies, regulatory compliance analysis, and sustainable investment strategies. Specializes in carbon footprint metrics, SDG (Sustainable Development Goals) alignment, and greenwashing risk assessment."
     },
     {
         "name": "Quantum Physicist",
@@ -166,7 +166,7 @@
         "rated_responses": 115,
         "average_rating": 7.8,
         "object_id": "6ee1fe4f-2d92-466a-abd1-6b50c5e12ee2",
-        "processed_description": "Quantum physics education, focusing on teaching fundamental concepts, mathematical foundations, and basic quantum mechanics. Simplifying complex theories using analogies, visual explanations, and appropriate mathematical notation to enhance understanding. Building intuition while maintaining scientific accuracy in quantum mechanics fundamentals, wave functions, and basic phenomena."
+        "processed_description": "Quantum mechanics instruction, covering fundamental concepts, mathematical foundations, and basic phenomena in quantum physics. Educational approaches emphasize clarity, intuitive understanding, analogies, visual explanations, and simple mathematical notation while maintaining scientific accuracy."
     },
     {
         "name": "Quantum Computing Researcher",
@@ -179,7 +179,7 @@
         "rated_responses": 62,
         "average_rating": 9.1,
         "object_id": "48070d73-8cec-4c63-8e6b-9b8798e9278e",
-        "processed_description": "Quantum Algorithm Design, Error Correction, and Quantum Circuit Development. Expertise in theoretical foundations and practical implementations of quantum computing, including mathematical proofs, circuit diagrams, computational complexity analysis, considering noise models, decoherence effects, and hardware constraints. Always referencing relevant research papers, theoretical bounds, experimental results, and discussing limitations and error rates of proposed approaches. Knowledgeable in various quantum programming frameworks such as Qiskit, Cirq."
+        "processed_description": "Quantum information theory, error correction, and algorithm design for quantum computing research. Skilled in mathematical proofs, quantum circuit diagrams, computational complexity analysis, and implementation strategies such as Qiskit or Cirq. Addresses noise models, decoherence effects, and hardware constraints while referencing relevant research papers, theoretical bounds, and experimental results. Discusses limitations and error rates of proposed approaches in the field of quantum computing."
     },
     {
         "name": "Quantum Engineer",
@@ -192,7 +192,7 @@
         "rated_responses": 70,
         "average_rating": 8.8,
         "object_id": "f046ddc1-15c2-40f4-a0bd-b70c7ce30e16",
-        "processed_description": "Quantum system design, optimization, and implementation of quantum protocols. Analyzing quantum system requirements, noise characteristics, and hardware constraints while incorporating insights from quantum information theory, many-body physics, and quantum error correction. Developing practical solutions that bridge theoretical understanding with implementation, considering coherence times, gate fidelities, and quantum advantage criteria. Addressing decoherence, cross-talk, and scalability challenges in quantum systems through mathematical frameworks and physical principles. Including experimental protocols, calibration procedures, and performance optimization techniques while referencing relevant research papers and theoretical foundations."
+        "processed_description": "Quantum technology design, focusing on system optimization and implementation of quantum protocols, with theoretical physics expertise. Analyzing quantum system requirements, noise characteristics, and hardware constraints while incorporating insights from quantum information theory, many-body physics, and quantum error correction. Addressing decoherence, cross-talk, and scalability challenges in quantum systems through mathematical frameworks and physical principles. Providing experimental protocols, calibration procedures, and performance optimization techniques, referencing relevant research papers and theoretical foundations."
     },
     {
         "name": "Game Developer",
@@ -205,7 +205,7 @@
         "rated_responses": 142,
         "average_rating": 7.6,
         "object_id": "1d70cdbf-1148-40c8-aa7c-0d417a658d1f",
-        "processed_description": "Game Development Tutoring: Teaches beginners essential gaming concepts like game loops, physics, AI behaviors, and fundamental programming patterns in Unity/Unreal. Emphasizes practical applications and good coding practices by providing working solutions with code examples. Focuses on understanding and implementing simple game mechanics and techniques to develop games."
+        "processed_description": "Game Development Tutoring: Fundamental concepts, Unity/Unreal basics, game mechanics implementation, focusing on game loops, physics, AI behaviors, and programming patterns. Practical coding examples with emphasis on good coding practices to support beginner understanding."
     },
     {
         "name": "Engine Developer",
@@ -218,7 +218,7 @@
         "rated_responses": 65,
         "average_rating": 9.2,
         "object_id": "37450c2f-db7f-4b6c-867a-a86f2774ff01",
-        "processed_description": "Game engine development, with expertise in graphics programming, physics simulation, and game architecture design. Proficient in rendering techniques, physics implementations, and optimization strategies for high-performance gaming experiences. Skilled in low-level optimization, memory management, cache optimization, and addressing platform constraints using C++/HLSL/GLSL. Familiar with mathematical derivations, performance profiling approaches, architectural considerations, cross-platform compatibility, and hardware limitations. Always referencing relevant research papers, technical documentation, and industry standards to provide implementation guidance for efficient engine design."
+        "processed_description": "Engine Development: Focusing on graphics programming, physics simulation, and game architecture. Develop rendering techniques, implement physics systems, and optimize game engines for high performance. Expertise in low-level optimization, engine design patterns, memory management, cache optimization, and hardware limitations. Proficient in C++/HLSL/GLSL. Addresses cross-platform considerations while referencing relevant research papers, technical documentation, and industry standards to make informed decisions on implementation strategies and tradeoffs."
     },
     {
         "name": "Game Tech Director",
@@ -231,7 +231,7 @@
         "rated_responses": 78,
         "average_rating": 8.7,
         "object_id": "d8928243-95f2-44ee-90fd-0a946f5359ae",
-        "processed_description": "Game Tech Director: Expertise in performance optimization, gameplay systems, and scalable architecture design within game development. Analyzing technical requirements, memory constraints, and scalability needs, with an emphasis on rendering optimization and architecture design. Provides comprehensive solutions to bridge engine technology and gameplay needs, including optimization strategies, debugging approaches, and architecture patterns that adhere to industry best practices and technical foundations. Addresses cross-platform challenges, multiplayer considerations, and content pipeline optimization in both Unity/Unreal and custom engine scenarios."
+        "processed_description": "Game Tech Director:\nSpecializes in game development leadership, focusing on performance optimization, scalable architecture, and gameplay systems design. Expertise encompasses analyzing technical requirements, memory constraints, and rendering optimizations to deliver high-performance gaming experiences across platforms. Proficient in referencing industry best practices, technical foundations, and providing guidance for Unity/Unreal and custom engine scenarios. Key responsibilities include optimization strategies, debugging approaches, content pipeline optimization, cross-platform challenges, multiplayer considerations, and addressing gameplay needs within technological constraints."
     },
     {
         "name": "Python Developer",
@@ -244,7 +244,7 @@
         "rated_responses": 195,
         "average_rating": 7.8,
         "object_id": "deb24950-4338-4dcf-8c8f-5c146a002b90",
-        "processed_description": "Pythonic programming education, focusing on fundamentals (data structures, file handling), syntax, and common patterns for beginners. Code examples with detailed explanations to encourage readable solutions that adhere to PEP 8 guidelines."
+        "processed_description": "Python tutoring for beginners, covering fundamental concepts, syntax, and common programming patterns in Python. Focus on data structures, file handling, and adhering to PEP 8 guidelines for readable, Pythonic solutions. Provides code examples with explanations to reinforce learning."
     },
     {
         "name": "Python Systems Architect",
@@ -257,7 +257,7 @@
         "rated_responses": 72,
         "average_rating": 9.1,
         "object_id": "e5ebb4c3-88db-4c8c-b925-c695735c7a5c",
-        "processed_description": "Python systems architecture, distributed computing, and high-performance optimization. Advanced Python internals, async programming, and concurrency management. Proficiency in design patterns, memory optimization techniques, and architectural considerations for scalable systems. Threading models, I/O patterns, and production deployment focusing on concurrency, memory management, and relevant industry standards. Provides implementation guidance using advanced Python features, referencing appropriate documentation and discussing trade-offs between various approaches."
+        "processed_description": "High-performance Python systems architecture, focusing on distributed computing, optimizations, and advanced internals using async programming. Expertise in performance profiling, memory management techniques, and architectural design patterns. Discusses tradeoffs between different approaches while providing implementation guidance with relevant documentation, industry standards, and design patterns. Addresses concurrency, threading models, I/O patterns, scalability constraints, and production deployment considerations."
     },
     {
         "name": "Python Backend Developer",
@@ -270,7 +270,7 @@
         "rated_responses": 125,
         "average_rating": 8.7,
         "object_id": "a4e4b9b4-dcda-4f55-8b84-f1647371d93b",
-        "processed_description": "Python Backend Developer:\n   - Full-stack engineering in Python, combining systems expertise with web development knowledge.\n   - Scalable application development, API design, and modern Python frameworks usage (FastAPI/Django/Flask).\n   - Database optimization, design, and architecture.\n   - Incorporating distributed system insights, caching strategies, and contemporary Python practices.\n   - Analyzing performance requirements, technical choices through scalability and maintainability lenses.\n   - Addressing deployment strategies, testing approaches, and security best practices.\n   - Containerization, CI/CD pipelines, and cloud deployment considerations.\n   - Guidance on monolithic and microservices architectures."
+        "processed_description": "Python Backend Development:\n- Scalable application development using modern frameworks (FastAPI/Django/Flask)\n- API design with focus on database architectures and performance optimization\n- Incorporate insights from distributed systems, caching strategies, and Python best practices for efficient backend solutions.\n- Emphasis on system design, addressing deployment strategies, testing approaches, and security considerations.\n- Guidance on monolithic and microservices architectures, containerization, CI/CD pipelines, and cloud deployments."
     },
     {
         "name": "Travel Guide",
@@ -283,7 +283,7 @@
         "rated_responses": 145,
         "average_rating": 7.6,
         "object_id": "d48b024f-fcda-4f6d-84c5-3cbf2c974f23",
-        "processed_description": "Travel guide design, efficient itinerary planning, budget optimization, and practical framework development for modern travelers. Reliable content creation with up-to-date recommendations, clear advice, and engaging writing style. Focus on navigating new destinations while maintaining a practical approach."
+        "processed_description": "Travel Guide Designer:\nEffective travel planning, itinerary optimization, budget management, and destination navigation. Provides reliable, up-to-date recommendations while focusing on practical solutions for modern travelers. Engaging writing style to create well-structured travel content."
     },
     {
         "name": "Culture Explorer",
@@ -296,7 +296,7 @@
         "rated_responses": 75,
         "average_rating": 9.2,
         "object_id": "76ce6755-128d-476f-9f20-741df1e7f8aa",
-        "processed_description": "Culture Analysis Specialist: Expert in travel journalism, focusing on systemic analysis of global cultures, historical contexts, and patterns of local traditions. Integration of traditional practices with modern social dynamics, including political systems, religious frameworks, and cultural boundaries. Utilizes reliable sources, local expertise, and current developments to guide users through culturally sensitive experiences in preservation, sustainable tourism, and authentic interactions."
+        "processed_description": "Cultural analysis, heritage preservation, sustainable tourism, and community integration. Expertise in understanding cultural connections, patterns of local traditions, and modern social dynamics. Focuses on historical contexts, political systems, religious frameworks, and cultural boundaries. Relies on reliable sources, local expertise, and current developments to guide authentic, immersive travel experiences."
     },
     {
         "name": "Adventure Expert",
@@ -309,6 +309,6 @@
         "rated_responses": 88,
         "average_rating": 8.8,
         "object_id": "aae39d32-8009-4ebc-8713-ec6afce7204b",
-        "processed_description": "Adventure Experience Designer: Expertise in outdoor activities, sustainable tourism systems, and remote destination exploration. Analyzing accessibility, safety requirements, and seasonal patterns for comprehensive adventure travel planning. Cultural immersion with local traditions, environmental systems, and community networks. Creating guides that integrate safety guidelines, equipment recommendations, cultural protocols, and respect for local knowledge and environmental practices to promote responsible tourism, nature preservation, and community engagement."
+        "processed_description": "Adventure experience design, destination planning, and sustainable tourism system management. Expertise in outdoor activities, accessibility analysis, safety requirements, seasonal patterns, activity design, equipment needs, and local regulations. Cultural understanding, connecting with traditions, environmental systems, and community networks. Respect for sustainability patterns, cultural integrity, weather systems, physical demands, and emergency preparation. Comprehensive guide creation covering adventure experiences, cultural understanding, safety guidelines, equipment recommendations, and cultural protocols. Promoting responsible tourism, nature preservation, and community engagement."
     }
 ]

@@ -6,9 +6,10 @@ from typing import List
 
 import re
 import numpy as np
+import torch
 from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from rank_bm25 import BM25Okapi
+from transformers import AutoModelForMaskedLM, AutoTokenizer
 from sentence_transformers import SentenceTransformer
 
 
@@ -131,7 +132,51 @@ class TfIdfEF(BaseEmbeddingFunction):
             processed_texts.append(processed_text)
         return processed_texts
     
+class SPLADEEmbeddingFunction(BaseEmbeddingFunction):
+    """
+    SPLADE embedding function subclass that creates sparse embeddings using
+    a pre-trained SPLADE model.
+    """
 
+    def __init__(self, model_id='naver/splade-cocondenser-ensembledistil'):
+        """
+        Initializes the SPLADE embedding function with a specified model.
+
+        Args:
+            model_id (str): The Hugging Face model ID for SPLADE.
+        """
+        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self.model = AutoModelForMaskedLM.from_pretrained(model_id)
+
+    def create_embeddings(self, texts: List[str], *args, **kwargs) -> List[List[float]]:
+        """
+        Create sparse embeddings for the given input texts.
+
+        Args:
+            texts (List[str]): A list of input text strings.
+
+        Returns:
+            List[List[float]]: A list of sparse embedding vectors.
+        """
+        embeddings = []
+
+        for text in texts:
+            # Tokenize input text
+            tokens = self.tokenizer(text, return_tensors='pt')
+            
+            # Process tokens through the model to get logits
+            output = self.model(**tokens)
+            
+            # Calculate sparse vector for SPLADE
+            sparse_vec = torch.max(
+                torch.log1p(torch.relu(output.logits)) * tokens['attention_mask'].unsqueeze(-1),
+                dim=1
+            )[0].squeeze()
+            
+            embeddings.append(sparse_vec.tolist())  # Convert tensor to list for compatibility
+
+        return embeddings
+    
 class EnsembleEF(BaseEmbeddingFunction):
     def __init__(self, embedding_functions: List[BaseEmbeddingFunction], weights: List[float], normalize: bool = False):
         self.embedding_functions = embedding_functions

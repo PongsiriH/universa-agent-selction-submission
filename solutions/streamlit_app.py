@@ -47,6 +47,7 @@ if st.button("Submit Query"):
         for result in results
     ]
 
+    exploration_rate = st.slider("Exploration Rate", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
     col1, col2 = st.columns([1, 1])
     # 2. Top N Agents - Display agent information table with sample counts
     with col1:
@@ -55,7 +56,7 @@ if st.button("Submit Query"):
 
         # Perform softmax sampling on "Adjusted Composite Score" and add 'Sample Count' column
         sampled_agent_index, sampled_agent_ids, softmax_scores = softmax_sampling(
-            agent_info_list, "Adjusted Composite Score", exploration_rate=1.0, n_samples=100
+            agent_info_list, "Adjusted Composite Score", exploration_rate=exploration_rate, n_samples=100
         )
         sample_counts = Counter(sampled_agent_ids)
         agent_info_df['Sample Count'] = agent_info_df['Agent ID'].map(sample_counts).fillna(0).astype(int)
@@ -86,7 +87,7 @@ if st.button("Submit Query"):
         # Perform softmax sampling on "Composite Score" for filtered agents
         filtered_agent_list = filtered_agent_info_df.to_dict('records')
         _, filtered_sampled_agent_ids, filtered_softmax_scores = softmax_sampling(
-            filtered_agent_list, "Composite Score", exploration_rate=1.0, n_samples=100
+            filtered_agent_list, "Composite Score", exploration_rate=exploration_rate, n_samples=100
         )
         filtered_sample_counts = Counter(filtered_sampled_agent_ids)
         filtered_agent_info_df['Sample Count'] = filtered_agent_info_df['Agent ID'].map(filtered_sample_counts).fillna(0).astype(int)

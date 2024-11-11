@@ -22,12 +22,13 @@ pip install -r requirements.txt
 python solutions/run_benchmark.py
 ```
 
-
+# How to run streamlit app?
 To run streamlit:
 ```
 streamlit run solutions/streamlit_app.py
 ```
 This is good for visualizing sampling process (instead of selecting one with highest similarity score).
 
+# ..
 Sorry, code is a bit messy due to time limitation. 
 Any question, you can email huangpongsiri@gmail.com

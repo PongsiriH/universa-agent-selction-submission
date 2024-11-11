@@ -13,6 +13,7 @@ This is a submission by Chillax. All of the solutions can be found in `solutions
 - `solutions/run_benchmark.py` simply run benchmark on Algorithm.
 
 # How to use this repo?
+To run benchmark:
 ```
 git clone https://github.com/PongsiriH/universa-agent-selction-submission.git
 cd universa-agent-selction-submission
@@ -20,6 +21,13 @@ pip install -r requirements.txt
 
 python solutions/run_benchmark.py
 ```
+
+
+To run streamlit:
+```
+streamlit run solutions/streamlit_app.py
+```
+This is good for visualizing sampling process (instead of selecting one with highest similarity score).
 
 Sorry, code is a bit messy due to time limitation. 
 Any question, you can email huangpongsiri@gmail.com

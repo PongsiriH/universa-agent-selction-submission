@@ -1,258 +1,109 @@
+import os
 import _import_root
-import streamlit as st
 import pysqlite3
+import streamlit as st
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-import os
+from selection_algorithm import Algorithm2, softmax_sampling
+from custom_embedder import SentenceTransformerEF, SPLADEEmbeddingFunction
+import json
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import math
-from universa.agents import BaseAgent
-from universa.memory.chromadb.chromadb import ChromaDB
-from solutions.custom_embedder import SentenceTransformerEF, TfIdfEF, EnsembleEF
 from collections import Counter
+import matplotlib.pyplot as plt
 
-# Set up full-screen layout
 st.set_page_config(layout="wide")
-
-# Composite score calculation function
-def calculate_composite_score(agent, similarity_score):
-    """
-    Calculates the composite score for an agent based on various factors.
-    """
-    w0, w1, w2, w3 = 1, 0.5, -0.3 / 5, -0.2 / 5
-    baseline_rating = 1
-    k = 10
-    adjusted_quality_score = (agent.average_rating * agent.rated_responses + baseline_rating * k) / (agent.rated_responses + k)
-    log_popularity_score = math.log(agent.popularity + 1)
-    total_estimated_cost = agent.input_cost + agent.output_cost
-    response_time = agent.response_time
-    composite_score = (
-        w0 * adjusted_quality_score +
-        w1 * log_popularity_score +
-        w2 * total_estimated_cost +
-        w3 * response_time
-    )
-    return composite_score, adjusted_quality_score, log_popularity_score, total_estimated_cost, response_time
-
-# Cache agent loading and embedding setup
 @st.cache_resource
-def load_agents_and_embedding():
-    """
-    Loads agents from JSON files and fits embedding functions.
-    """
-    agents = []
-    agents_dict = {}
-    for agent_json in os.listdir('data/agents'):
-        agent = BaseAgent.from_json(os.path.join("data/agents", agent_json))
-        agent.model = None  # Ensure model is not loaded
-        agents.append(agent)
-        agents_dict[agent.name] = agent
+def setup_selection_algorithm():
+    def load_agents():
+        agents = []
+        agent_ids = []
+        for agent_json in os.listdir('data/agents'):
+            with open(os.path.join("data/agents", agent_json), 'r') as f:
+                agent = json.load(f)
+            agents.append(agent)
+            agent['object_id'] = agent['uuid'] # for compatibility
+            agent_ids.append(agent['uuid'])
+        return agents, agent_ids
 
-    nn_ef = SentenceTransformerEF()
-    tfidf_ef = TfIdfEF()
-    tfidf_ef.fit([str(agent.description) for agent in agents])
-    return agents, agents_dict, (nn_ef, tfidf_ef)
+    embedding_functions = [SPLADEEmbeddingFunction(), SentenceTransformerEF("all-mpnet-base-v2")]
+    agents, agent_ids = load_agents()
+    selection = Algorithm2(agents, agent_ids)
+    selection.ranked_by('description')
+    selection.configure_embeddings_and_setup_chromadb(embedding_functions=embedding_functions)
+    return selection
 
-@st.cache_resource
-def setup_chromadb(_agents, weights):
-    """
-    Sets up the ChromaDB with the given agents and weights.
-    """
-    chroma = ChromaDB(
-        embedding_function=EnsembleEF(efs, weights),
-        collection_name="example_collection",
-        metadata={"hnsw:space": "cosine"}
-    )
-    chroma.add_data(
-        documents=[str(agent.description) for agent in _agents],
-        ids=[str(agent.name) for agent in _agents]
-    )
-    return chroma
+selection = setup_selection_algorithm()
 
-def apply_softmax_sampling(df, exploration_rate=0.5, num_samples=100):
-    """
-    Applies softmax sampling to the agents based on their composite scores.
-    """
-    logits = df['Composite Score'].to_numpy() / exploration_rate
-    # For numerical stability
-    exp_logits = np.exp(logits - np.max(logits))
-    softmax_scores = exp_logits / np.sum(exp_logits)
-    sampled_agents = np.random.choice(df["Agent name"], size=num_samples, p=softmax_scores)
-    sample_counts = Counter(sampled_agents)
-    df.loc[:, "Sample Count"] = df["Agent name"].map(sample_counts).fillna(0).astype(int)
-    return df, softmax_scores
-
-def process_query(query, chroma, agents_dict, n_results=5, exploration_rate=0.5, num_samples=100):
-    """
-    Processes the user's query and returns DataFrames for display.
-    """
-    result = chroma.query_data([query], n_results=n_results)
+# Query input section
+st.write("### Enter a New Query")
+query = st.text_input("Enter a query:", "")
+if st.button("Submit Query"):
     
-    # Return immediately if no results are found
-    if not result["ids"][0]:
-        return None, None, 0, False, None, None
-
-    # Generate scores and create DataFrame
-    scored_agents = score_agents(result, agents_dict)
-    df = create_dataframe(scored_agents)
-
-    # Check if a suitable agent was found
-    max_similarity = df["Similarity Score"].max()
-    found_suitable_agent = max_similarity >= 0.2
-
-    # Apply softmax sampling and create display DataFrame
-    df_display, softmax_scores = prepare_display_dataframe(df, exploration_rate, num_samples)
-
-    # Filter and process agents with higher similarity
-    filtered_agents_display, filtered_softmax_scores = process_filtered_agents(df, max_similarity, exploration_rate, num_samples)
-
-    return df_display, filtered_agents_display, max_similarity, found_suitable_agent, softmax_scores, filtered_softmax_scores
-
-def score_agents(result, agents_dict):
-    """
-    Scores each agent based on similarity and composite score.
-    """
-    scored_agents = []
-    for agent_id, dissimilarity_score in zip(result["ids"][0], result["distances"][0]):
-        agent = agents_dict[agent_id]
-        similarity_score = 1 - dissimilarity_score
-        composite_score, adjusted_quality_score, log_popularity_score, total_estimated_cost, response_time = calculate_composite_score(agent, None)
-        adjusted_composite_score = similarity_score * composite_score
-        scored_agents.append({
-            "Agent name": agent.name,
-            "Agent description": agent.description.replace('\n', ' '),
-            "Composite Score": composite_score,
-            "Adjusted Composite Score": adjusted_composite_score,
-            "Similarity Score": similarity_score,
-            "Quality Score": adjusted_quality_score,
-            "Log Popularity": log_popularity_score,
-            "Cost": total_estimated_cost,
-            "Response Time": response_time
-        })
-    return sorted(scored_agents, key=lambda x: x["Composite Score"], reverse=True)
-
-def create_dataframe(scored_agents):
-    """
-    Converts the scored agents list into a DataFrame.
-    """
-    columns = [
-        "Agent name", "Agent description", "Composite Score", "Adjusted Composite Score", "Similarity Score",
-        "Quality Score", "Log Popularity", "Cost", "Response Time"
+    # 1. Retrieve agent results based on the query
+    results = selection.select(query, return_best=False)
+    agent_info_list = [
+        selection.score_agent(result['Agent ID'], 1 - result['Combined RRF Score'])
+        for result in results
     ]
-    data = [
-        [
-            agent["Agent name"], agent["Agent description"], agent["Composite Score"], agent["Adjusted Composite Score"],
-            agent["Similarity Score"], agent["Quality Score"], agent["Log Popularity"],
-            agent["Cost"], agent["Response Time"]
-        ] for agent in scored_agents
-    ]
-    return pd.DataFrame(data, columns=columns)
 
-def prepare_display_dataframe(df, exploration_rate, num_samples):
-    """
-    Applies softmax sampling and prepares the display DataFrame.
-    """
-    df, softmax_scores = apply_softmax_sampling(df, exploration_rate, num_samples)
-    
-    # Round values for display
-    df_display = df.copy()
-    columns_to_round = [
-        "Composite Score", "Adjusted Composite Score", "Similarity Score", "Quality Score",
-        "Log Popularity", "Cost", "Response Time"
-    ]
-    df_display[columns_to_round] = df_display[columns_to_round].round(2)
-    return df_display, softmax_scores
+    col1, col2 = st.columns([1, 1])
+    # 2. Top N Agents - Display agent information table with sample counts
+    with col1:
+        st.write("### Top N Agents (with Sample Counts)")
+        agent_info_df = pd.DataFrame(agent_info_list)
 
-def process_filtered_agents(df, max_similarity, exploration_rate, num_samples):
-    """
-    Filters agents based on similarity and applies softmax sampling.
-    """
-    filtered_agents = df[df["Similarity Score"] > 0.8 * max_similarity]
-    filtered_agents, filtered_softmax_scores = apply_softmax_sampling(filtered_agents, exploration_rate, num_samples)
-    
-    # Round values for display
-    filtered_agents_display = filtered_agents.copy()
-    columns_to_round = [
-        "Composite Score", "Adjusted Composite Score", "Similarity Score", "Quality Score",
-        "Log Popularity", "Cost", "Response Time"
-    ]
-    filtered_agents_display[columns_to_round] = filtered_agents_display[columns_to_round].round(2)
-    return filtered_agents_display, filtered_softmax_scores
-
-# Load agents and embeddings
-agents, agents_dict, efs = load_agents_and_embedding()
-
-# User Interface
-st.title("Agent Selection Query Tool")
-
-# Adjust layout
-col1, col2 = st.columns([1, 2])
-
-with col1:
-    st.header("Settings")
-    semantic_weight = st.slider("Semantic Weight", 1e-5, 1.0, 0.5)
-    lexical_weight = st.slider("Lexical Weight", 1e-5, 1.0, 0.5)
-    exploration_rate = st.slider(
-        "Exploration Rate", 0.01, 50.0, 0.5,
-        help="Controls the randomness in sampling."
-    )
-    num_samples = st.number_input(
-        "Number of Samples", min_value=1, max_value=1000, value=100,
-        help="Number of agents to sample."
-    )
-    n_results = st.number_input(
-        "Number of Results", min_value=1, max_value=100, value=5,
-        help="Number of top agents to retrieve."
-    )
-
-    # Re-setup chromadb with new weights
-    chroma = setup_chromadb(agents, [semantic_weight, lexical_weight])
-
-with col2:
-    col21, col22 = st.columns([3, 4])
-
-    st.header("Query")
-    query = st.text_input("Enter a query:")
-    if st.button("Submit Query"):
-        result = process_query(
-            query, chroma, agents_dict, n_results, exploration_rate, num_samples
+        # Perform softmax sampling on "Adjusted Composite Score" and add 'Sample Count' column
+        sampled_agent_index, sampled_agent_ids, softmax_scores = softmax_sampling(
+            agent_info_list, "Adjusted Composite Score", exploration_rate=1.0, n_samples=100
         )
-        if result[0] is None:
-            st.warning("No agents found matching your query.")
-        else:
-            (
-                df_display, filtered_agents_display, max_similarity,
-                found_suitable_agent, softmax_scores, filtered_softmax_scores
-            ) = result
+        sample_counts = Counter(sampled_agent_ids)
+        agent_info_df['Sample Count'] = agent_info_df['Agent ID'].map(sample_counts).fillna(0).astype(int)
 
-            st.write(f"Found suitable agent: **{found_suitable_agent}** with max similarity of **{round(max_similarity, 2)}**")
+        # Plot softmax scores for Top N Agents
+        fig, ax = plt.subplots(figsize=(10, 4))
+        agent_names = [agent["Agent name"] for agent in agent_info_list]
+        ax.bar(agent_names, softmax_scores)
+        ax.set_xlabel("Agents")
+        ax.set_ylabel("Softmax Score")
+        ax.set_title("Softmax Scores for Top N Agents")
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
+        st.pyplot(fig)
 
+        column_order = ["Agent ID", "Agent name", "Sample Count", "Composite Score", "Adjusted Composite Score", 
+                        "Similarity Score", "Quality Score", "Log Popularity", "Cost", "Response Time", "Agent description"]
+        agent_info_df = agent_info_df[column_order]
+        # Display the updated DataFrame without 'Agent ID' column
+        st.dataframe(agent_info_df.drop(columns=["Agent ID"]))
 
-            with col21:
-                st.dataframe(df_display)
+    # 3. Filtered Agents - Display agents filtered by similarity score with updated sample counts
+    with col2:
+        st.write("### Filtered Agents (Similarity Score > 80% of Max)")
+        # Filter agents with similarity score > 80% of max similarity score
+        filtered_agent_info_df = agent_info_df[agent_info_df['Similarity Score'] > 0.8 * agent_info_df['Similarity Score'].max()]
 
-                fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-                ax.bar(df_display['Agent name'], softmax_scores)
-                ax.set_ylim(0, 1)
-                ax.set_xlabel('Agents')
-                ax.set_ylabel('Softmax Score')
-                ax.set_title('Softmax Scores for Filtered Agents')
-                ax.tick_params(axis='x', rotation=45)
-                plt.tight_layout()
-                st.pyplot(fig)
+        # Perform softmax sampling on "Composite Score" for filtered agents
+        filtered_agent_list = filtered_agent_info_df.to_dict('records')
+        _, filtered_sampled_agent_ids, filtered_softmax_scores = softmax_sampling(
+            filtered_agent_list, "Composite Score", exploration_rate=1.0, n_samples=100
+        )
+        filtered_sample_counts = Counter(filtered_sampled_agent_ids)
+        filtered_agent_info_df['Sample Count'] = filtered_agent_info_df['Agent ID'].map(filtered_sample_counts).fillna(0).astype(int)
 
-            with col22:
-                st.dataframe(filtered_agents_display)
+        # Plot softmax scores for Filtered Agents
+        fig, ax = plt.subplots(figsize=(10, 4))
+        filtered_agent_names = filtered_agent_info_df['Agent name'].tolist()
+        ax.bar(filtered_agent_names, filtered_softmax_scores)
+        ax.set_xlabel("Filtered Agents")
+        ax.set_ylabel("Softmax Score")
+        ax.set_title("Softmax Scores for Filtered Agents")
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
+        st.pyplot(fig)
 
-                fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-                ax.bar(filtered_agents_display['Agent name'], filtered_softmax_scores)
-                ax.set_ylim(0, 1)
-                ax.set_xlabel('Agents')
-                ax.set_ylabel('Softmax Score')
-                ax.set_title('Softmax Scores for Filtered Agents')
-                ax.tick_params(axis='x', rotation=45)
-                plt.tight_layout()
-                st.pyplot(fig)
+        # Display the filtered DataFrame without 'Agent ID' column
+        column_order = ["Agent ID", "Agent name", "Sample Count", "Composite Score", "Adjusted Composite Score", 
+                "Similarity Score", "Quality Score", "Log Popularity", "Cost", "Response Time", "Agent description"]
+        filtered_agent_info_df = agent_info_df[column_order]
+        st.dataframe(filtered_agent_info_df.drop(columns=["Agent ID"]))

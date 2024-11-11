@@ -17,8 +17,7 @@ def run_algorithm2(description_type, embedding_functions, verbose=False):
     score = benchmark.validate(algorithm, verbose=verbose)
     return score
 
-if __name__ == "__main__":
-    runs = 5
+def main():
     input_keys = ['description', 'processed_description']
     embedding_functions_configs = {
         "mpnet": [None, SentenceTransformerEF("all-mpnet-base-v2")],
@@ -61,3 +60,14 @@ if __name__ == "__main__":
     print("\nScores Table:")
     print(df)
     df.to_csv('solutions/results.csv')
+
+def analyze_best():
+    input_key, best_config = "processed_description", [SPLADEEmbeddingFunction(), SentenceTransformerEF("all-mpnet-base-v2")]
+    for run in range(runs):
+        input_key_run = f'{input_key}_{run}' if input_key.startswith('processed_description') else input_key
+        score = run_algorithm2(input_key_run, best_config, verbose=True)
+
+if __name__ == "__main__":
+    runs = 5
+    # main()
+    analyze_best()
